@@ -367,7 +367,8 @@
     </div>
 
     <div class="quiz-space" id="quiz-container">
-        </div>
+        <!-- Questions dynamically loaded here -->
+    </div>
 
     <div class="action-space">
         <button class="submit-btn" id="check-answers-btn" onclick="revealAllExplanations()">Semak Jawapan Keseluruhan</button>
@@ -375,7 +376,6 @@
 </div>
 
 <script>
-    // Audio synthesis context ditangguhkan sehingga pengguna klik
     let audioCtx = null;
 
     function initAudio() {
@@ -440,15 +440,15 @@
         },
         {
             topic: "Penjodoh Bilangan",
-            question: "Mak Cik Kalsom memasukkan beberapa __________ serai dan dua __________ asam gelugur ke dalam gulai patin itu.",
+            question: "Mak Cik Kalsom memasukkan dua __________ serai dan tiga __________ asam gelugur ke dalam gulai patin itu.",
             options: [
-                "A. batang ... hiris",
-                "B. rumpun ... keping",
+                "A. rumpun ... hiris",
+                "B. batang ... keping",
                 "C. ikat ... ketul",
                 "D. berkas ... biji"
             ],
             correct: 1,
-            explanation: "Serai tumbuh secara berkumpul, maka penjodoh bilangannya ialah 'rumpun'. Asam gelugur yang dikeringkan dikira dalam bentuk 'keping'."
+            explanation: "Penjodoh bilangan yang tepat untuk serai yang dimasukkan ke dalam masakan ialah 'batang'. Asam gelugur yang dikeringkan pula dikira dalam bentuk 'keping'."
         },
         {
             topic: "Kata Adjektif Cara",
@@ -660,11 +660,11 @@
             options: [
                 "A. Surat itu telah dihantar oleh saya pagi tadi.",
                 "B. Buku latihan itu kamu mesti hantar esok.",
-                "C. Kereta itu dipandu oleh mereka ke bandar.",
+                "C. Kereta itu mereka pandu ke bandar.",
                 "D. Rumah itu kami cat bersama-sama minggu lalu."
             ],
-            correct: 2,
-            explanation: "Pilihan C betul kerana kata ganti nama diri ketiga (mereka) menggunakan struktur 'di-...-oleh'. Bagi kata ganti diri pertama/kedua (saya/kamu), tidak boleh menggunakan 'di-...oleh'."
+            correct: 3,
+            explanation: "Pilihan D betul kerana struktur pasif bagi kata ganti nama diri pertama (kami) perlu diletakkan terus sebelum kata kerja dasar tanpa 'di' dan 'oleh'. Pilihan A dan C salah struktur, manakala B sepatutnya 'mesti kamu hantar'."
         },
         {
             topic: "Kata Majmuk Bebas",
@@ -742,13 +742,13 @@
             topic: "Kata Adjektif Bentuk",
             question: "Syafiq memotong kertas manila itu menjadi bentuk __________ untuk dijadikan tapak projek model rumahnya.",
             options: [
-                "A. bulat",
-                "B. leper",
+                "A. kasar",
+                "B. tebal",
                 "C. segi empat",
-                "D. kempis"
+                "D. luas"
             ],
             correct: 2,
-            explanation: "'Segi empat' ialah kata adjektif bentuk dua dimensi yang merujuk kepada reka bentuk geometri tapak struktur."
+            explanation: "'Segi empat' ialah satu-satunya kata adjektif bentuk dalam pilihan jawapan. 'Kasar' ialah pancaindera sentuh, manakala 'tebal' dan 'luas' ialah kata adjektif ukuran."
         },
         {
             topic: "Kata Tanya",
