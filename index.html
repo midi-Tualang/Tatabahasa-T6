@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penilaian Tatabahasa Bahasa Melayu - Tahun 6</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #eff6ff;
+            --secondary-color: #0d9488;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.15);
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .syllabus-card {
+            background: var(--card-bg);
+            border-left: 6px solid var(--secondary-color);
+            padding: 25px;
+            border-radius: 0 16px 16px 0;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .syllabus-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .syllabus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .syllabus-item {
+            background: var(--bg-light);
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            border: 1px solid #e2e8f0;
+        }
+
+        .progress-bar-container {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid #e2e8f0;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--success-color));
+            transition: width 0.3s ease;
+        }
+
+        .quiz-space {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .question-card.active-card {
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 1px fill #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .question-number {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .question-topic {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: var(--bg-light);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: var(--text-dark);
+            width: 100%;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            transform: translateX(4px);
+        }
+
+        .option-btn.wrong-attempt {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+            text-decoration: line-through;
+        }
+
+        .option-btn.selected-correct {
+            background-color: #d1fae5;
+            border-color: #34d399;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        .option-btn.reveal-correct {
+            background-color: #d1fae5;
+            border-color: #34d399;
+            color: #065f46;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge.try-again { color: var(--accent-color); }
+        .status-badge.locked-correct { color: var(--success-color); }
+        .status-badge.locked-wrong { color: var(--error-color); }
+
+        .explanation-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0fdf4;
+            border-left: 4px solid var(--success-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            display: none;
+            color: #166534;
+        }
+
+        .explanation-box.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .action-space {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #14b8a6);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(13, 148, 136, 0.3);
+            display: none;
+            animation: pulse 2s infinite;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.03);
+        }
+
+        .results-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+            display: none;
+            border: 2px solid var(--primary-color);
+        }
+
+        .score-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border: 4px solid var(--primary-color);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(13, 148, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            header { padding: 25px 15px; }
+            header h1 { font-size: 1.6rem; }
+            .option-btn { padding: 12px 15px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Modul Pentaksiran Tatabahasa Bahasa Melayu</h1>
+        <p>Edisi Pakar Pentaksiran Bilik Darjah (PBD) • Sesuai untuk Murid Tahun 6 SK/SJK</p>
+    </header>
+
+    <div class="syllabus-card">
+        <h2>📋 Senarai Fokus Tatabahasa Tahun 6 (KSSR Semakan)</h2>
+        <p>Berikut merupakan komponen pembentukan ayat dan tatabahasa utama yang wajib dikuasai oleh murid Tahun 6 sebelum melangkah ke peringkat menengah:</p>
+        <div class="syllabus-grid">
+            <div class="syllabus-item">1. Kata Nama Khas & Am</div>
+            <div class="syllabus-item">2. Penjodoh Bilangan</div>
+            <div class="syllabus-item">3. Kata Adjektif (9 Jenis)</div>
+            <div class="syllabus-item">4. Kata Kerja (Transitif/Tak)</div>
+            <div class="syllabus-item">5. Kata Sendi Nama</div>
+            <div class="syllabus-item">6. Kata Hubung & Penanda Wacana</div>
+            <div class="syllabus-item">7. Kata Ganda (Penuh/Separa/Berentak)</div>
+            <div class="syllabus-item">8. Kata Majmuk (Mantap/Bebas)</div>
+            <div class="syllabus-item">9. Kata Tugas (Penguat/Penegas/Nafi)</div>
+            <div class="syllabus-item">10. Ragam Ayat (Aktif/Pasif)</div>
+        </div>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-info">
+            <span id="progress-text">Status Menjawab: 0 daripada 40 soalan selesai</span>
+            <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="results-panel" id="results-panel">
+        <h2>🎉 Keputusan Ujian Pintar Tatabahasa 🎉</h2>
+        <p style="margin-bottom: 15px; color: var(--text-light);">Tahniah kerana telah menyelesaikan semua soalan!</p>
+        <div class="score-circle" id="score-display">0/40</div>
+        <h3 id="score-comment" style="color: var(--primary-color); margin-bottom: 10px;"></h3>
+        <p>Sila semak semula huraian dan pembetulan jawapan pada setiap kad soalan di bawah.</p>
+    </div>
+
+    <div class="quiz-space" id="quiz-container">
+        <!-- Questions dynamically loaded here -->
+    </div>
+
+    <div class="action-space">
+        <button class="submit-btn" id="check-answers-btn" onclick="revealAllExplanations()">Semak Jawapan Keseluruhan</button>
+    </div>
+</div>
+
+<script>
+    // Audio synthesis using Web Audio API to prevent external resource failure
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc.start();
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+            osc.stop(audioCtx.currentTime + 0.25);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(146.83, audioCtx.currentTime); // D3
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
+        }
+    }
+
+    const questionsData = [
+        {
+            topic: "Kata Nama Khas",
+            question: "Pilih ayat yang mempunyai penggunaan Kata Nama Khas yang betul sepenuhnya.",
+            options: [
+                "A. Encik Azam memandu kereta Proton X70 miliknya dengan berhati-hati.",
+                "B. Kami melawat Muzium negara yang terletak di Kuala Lumpur pada cuti sekolah.",
+                "C. Kucing kesayangan abang dinamakan si comel kerana bulunya lebat.",
+                "D. Kebanyakan Pelancong asing suka berkunjung ke Pulau Tioman."
+            ],
+            correct: 0,
+            explanation: "Proton X70 ialah kata nama khas untuk model kereta. 'Muzium Negara' sepatutnya berhuruf besar pada kata 'Negara'. 'Si Comel' perlu huruf besar 'S', manakala 'pelancong' ialah kata nama am."
+        },
+        {
+            topic: "Penjodoh Bilangan",
+            question: "Mak Cik Kalsom memasukkan beberapa __________ serai dan dua __________ asam gelugur ke dalam gulai patin itu.",
+            options: [
+                "A. batang ... hiris",
+                "B. rumpun ... keping",
+                "C. ikat ... ketul",
+                "D. berkas ... biji"
+            ],
+            correct: 1,
+            explanation: "Serai tumbuh secara berkumpul, maka penjodoh bilangannya ialah 'rumpun'. Asam gelugur yang dikeringkan dikira dalam bentuk 'keping'."
+        },
+        {
+            topic: "Kata Adjektif Cara",
+            question: "Kuda liar itu berlari dengan amat __________ apabila dikejar oleh pemburu di padang rumput.",
+            options: [
+                "A. deras",
+                "B. kencang",
+                "C. laju",
+                "D. tangkas"
+            ],
+            correct: 0,
+            explanation: "Kata adjektif 'deras' digunakan khusus untuk pergerakan makhluk hidup yang sangat pantas (seperti kuda/aliran air). Angin menggunakan 'kencang', kenderaan menggunakan 'laju'."
+        },
+        {
+            topic: "Kata Kerja Transitif",
+            question: "Syarikat pembinaan itu sedang __________ jambatan konkrit untuk menghubungkan kedua-dua buah kampung.",
+            options: [
+                "A. memperlebar",
+                "B. memperlebarkan",
+                "C. memperlebarkankan",
+                "D. melebarkan lagi"
+            ],
+            correct: 0,
+            explanation: "Imbuhan 'memper-...-kan' tidak boleh digunakan bersama kata adjektif dasar seperti 'lebar'. Pembentukan yang betul ialah 'memperlebar' atau 'melebarkan'."
+        },
+        {
+            topic: "Kata Sendi Nama",
+            question: "Sumbangan kebajikan itu akan diserahkan __________ pihak pengurusan anak-anak yatim __________ petang esok.",
+            options: [
+                "A. ke ... pada",
+                "B. kepada ... pada",
+                "C. kepada ... di",
+                "D. bagi ... jam"
+            ],
+            correct: 1,
+            explanation: "'Kepada' digunakan untuk sasaran manusia/institusi, manakala 'pada' digunakan di hadapan kata nama yang menyatakan waktu/masa."
+        },
+        {
+            topic: "Kata Hubung Pancangan",
+            question: "Suresh tetap mengulang kaji pelajaran dengan tekun __________ dia berasa kurang sihat.",
+            options: [
+                "A. sementara",
+                "B. walaupun",
+                "C. supaya",
+                "D. manakala"
+            ],
+            correct: 1,
+            explanation: "'Walaupun' ialah kata hubung pancangan konsesif (bertentangan) yang menghubungkan dua klausa yang menunjukkan pertentangan keadaan."
+        },
+        {
+            topic: "Kata Ganda Separa",
+            question: "Siling rumah usang itu dipenuhi dengan __________ sarang labah-labah yang sudah lama ditinggalkan.",
+            options: [
+                "A. dedaun",
+                "B. lelangit",
+                "C. jejari",
+                "D. sesawang"
+            ],
+            correct: 3,
+            explanation: "Kata ganda separa bagi sarang labah-labah ialah 'sesawang'. Lelangit merujuk kepada bahagian atas mulut atau ruang atas rumah."
+        },
+        {
+            topic: "Kata Majmuk Mantap",
+            question: "Semua ahli jawatankuasa diminta memberikan __________ bagi menjayakan Program Bulan Bahasa Kebangsaan.",
+            options: [
+                "A. kakitangan",
+                "B. kerjasama",
+                "C. tanggungjawab",
+                "D. sukarela"
+            ],
+            correct: 1,
+            explanation: "'Kerjasama' merupakan kata majmuk mantap yang ejaannya wajib dirapatkan sepenuhnya mengikut Tatabahasa Dewan."
+        },
+        {
+            topic: "Kata Penguat",
+            question: "Pemandangan di puncak Gunung Kinabalu itu __________ indah __________.",
+            options: [
+                "A. amat ... sekali",
+                "B. paling ... sekali",
+                "C. tersangat ... benar",
+                "D. terlalu ... sekali"
+            ],
+            correct: 0,
+            explanation: "Kata penguat bebas seperti 'amat', 'sangat', dan 'seterusnya' boleh hadir serentak bersama kata penguat belakang 'sekali'. Pilihan 'paling...sekali' dan 'terlalu...sekali' adalah lewah."
+        },
+        {
+            topic: "Kata Nafi",
+            question: "Tuduhan yang dilemparkan terhadap pemuda itu __________ benar, melainkan rekaan semata-mata.",
+            options: [
+                "A. tidak",
+                "B. bukan",
+                "C. kurang",
+                "D. mustahil"
+            ],
+            correct: 0,
+            explanation: "Kata nafi 'tidak' digunakan di hadapan frasa adjektif ('benar') dan frasa kerja, manakala 'bukan' untuk frasa nama dan frasa sendi nama."
+        },
+        {
+            topic: "Kata Ganti Nama Diri",
+            question: ""__________ mahu kamu semua bersiap sedia untuk menduduki ujian esok," kata Cikgu Halim kepada murid-muridnya.",
+            options: [
+                "A. Beliau",
+                "B. Saya",
+                "C. Kami",
+                "D. Kita"
+            ],
+            correct: 1,
+            explanation: "'Saya' ialah kata ganti nama diri pertama tunggal yang digunakan oleh guru apabila berbicara secara formal dengan murid-murid."
+        },
+        {
+            topic: "Penjodoh Bilangan",
+            question: "Ayah membeli dua __________ tikar mengkuang dan se__________ kunci di kedai kraf tangan itu.",
+            options: [
+                "A. bidang ... gugus",
+                "B. gulung ... biji",
+                "C. helai ... buah",
+                "D. keping ... bentuk"
+            ],
+            correct: 0,
+            explanation: "Tikar mengkuang menggunakan penjodoh bilangan 'bidang' (untuk benda luas/terbentang). Kumpulan anak kunci menggunakan 'gugus'."
+        },
+        {
+            topic: "Kata Adjektif Pancaindera",
+            question: "Masakan rendang daging yang disediakan oleh ibu berbau sangat __________ sehingga menaikkan selera kami.",
+            options: [
+                "A. wangi",
+                "B. tengik",
+                "C. harum",
+                "D. semerbak"
+            ],
+            correct: 3,
+            explanation: "'Semerbak' merujuk kepada bau harum yang tersebar luas menyerap ke udara, sangat tepat untuk masakan yang sedang dimasak."
+        },
+        {
+            topic: "Kata Kerja Tak Transitif",
+            question: "Adik kecil saya menangis teresak-esak kerana takut __________ bunyi guruh yang kuat.",
+            options: [
+                "A. akan",
+                "B. dengan",
+                "C. tentang",
+                "D. kepada"
+            ],
+            correct: 0,
+            explanation: "Kata kerja/adjektif emotif seperti 'takut', 'benci', 'rindu' wajib diikuti oleh kata sendi nama 'akan' sebelum objek nama."
+        },
+        {
+            topic: "Kata Sendi Nama",
+            question: "Puan Shanti datang __________ pejabat tanah untuk urusan pemilikan lot kedai itu.",
+            options: [
+                "A. daripada",
+                "B. dari",
+                "C. ke",
+                "D. di"
+            ],
+            correct: 2,
+            explanation: "Kata sendi nama 'ke' digunakan untuk arah atau tempat tujuan, manakala 'di' untuk tempat sedia ada."
+        },
+        {
+            topic: "Kata Ganda Berentak",
+            question: "Keadaan di pasar malam itu menjadi __________ dengan suara peniaga melaungkan harga barang.",
+            options: [
+                "A. riuh-rendah",
+                "B. sunyi-sepi",
+                "C. mundar-mandir",
+                "D. kucar-kacir"
+            ],
+            correct: 0,
+            explanation: "'Riuh-rendah' ialah kata ganda berentak seerti yang menggambarkan suasana sangat bising dan meriah dengan suara manusia."
+        },
+        {
+            topic: "Kata Perintah",
+            question: "__________ ambil perhatian semasa taklimat keselamatan kebakaran ini disampaikan.",
+            options: [
+                "A. Usah",
+                "B. Harap",
+                "C. Jangan",
+                "D. Sila"
+            ],
+            correct: 1,
+            explanation: "'Harap' digunakan untuk meminta perhatian atau memohon sesuatu tindakan dilakukan dengan penuh keinginan."
+        },
+        {
+            topic: "Kata Bilangan",
+            question: "__________ murid yang terlibat dalam kem kepimpinan itu diberikan sijil penghargaan.",
+            options: [
+                "A. Tiap-tiap",
+                "B. Setengah",
+                "C. Setiap",
+                "D. Berbagai"
+            ],
+            correct: 2,
+            explanation: "'Setiap' atau 'tiap-tiap' adalah betul, tetapi pilihan A ditulis 'Tiap-tiap' (pengulangan). Kata 'Setengah' salah (sepatutnya sesetengah). Maka 'Setiap' adalah yang paling tepat."
+        },
+        {
+            topic: "Kata Penguat",
+            question: "Air sungai di kawasan perkelahan pedalaman itu jernih __________.",
+            options: [
+                "A. agak",
+                "B. sekali",
+                "C. paling",
+                "D. terlalu"
+            ],
+            correct: 1,
+            explanation: "'Sekali' ialah kata penguat belakang yang boleh diletakkan selepas kata adjektif 'jernih'. 'Paling' dan 'terlalu' mesti di hadapan."
+        },
+        {
+            topic: "Ayat Pasif",
+            question: "Pilih ayat pasif yang betul mengikut sistem tatabahasa.",
+            options: [
+                "A. Surat itu telah dihantar oleh saya pagi tadi.",
+                "B. Buku latihan itu kamu mesti hantar esok.",
+                "C. Kereta itu dipandu oleh mereka ke bandar.",
+                "D. Rumah itu kami cat bersama-sama minggu lalu."
+            ],
+            correct: 2,
+            explanation: "Pilihan C betul kerana kata ganti nama diri ketiga (mereka) menggunakan struktur 'di-...-oleh'. Bagi kata ganti diri pertama/kedua (saya/kamu), tidak boleh menggunakan 'di-...oleh'."
+        },
+        {
+            topic: "Kata Majmuk Bebas",
+            question: "Bapa membeli sebuah __________ baharu untuk memudahkan ibu memasak lauk-pauk.",
+            options: [
+                "A. dapur gas",
+                "B. periuk nasi",
+                "C. alat tulis",
+                "D. kereta sorong"
+            ],
+            correct: 0,
+            explanation: "'Dapur gas' ialah kata majmuk bebas yang berfungsi sebagai satu unit objek nama untuk perkakas memasak menggunakan gas."
+        },
+        {
+            topic: "Kata Seru",
+            question: "__________, berani kamu mencuri buah-buahan di kebun aku ini!",
+            options: [
+                "A. Aduh",
+                "B. Cis",
+                "C. Wah",
+                "D. Oh"
+            ],
+            correct: 1,
+            explanation: "'Cis' ialah kata seru untuk menunjukkan perasaan marah, benci, geram atau memperlekehkan seseorang."
+        },
+        {
+            topic: "Imbuhan Apitan",
+            question: "Pihak berkuasa sedang mempergiat usaha untuk __________ sektor pelancongan domestik.",
+            options: [
+                "A. memajukan",
+                "B. memajukan lagi",
+                "C. mempermajukan",
+                "D. memajukankan"
+            ],
+            correct: 0,
+            explanation: "Kata dasar 'maju' (kata adjektif/kerja) menerima apitan 'meN-...-kan' membentuk 'memajukan'. Bentuk 'mempermajukan' adalah tidak gramatis."
+        },
+        {
+            topic: "Penanda Wacana",
+            question: "Sukan dapat menyihatkan badan. __________, sukan juga memupuk semangat perpaduan kaum.",
+            options: [
+                "A. Namun begitu",
+                "B. Oleh itu",
+                "C. Di samping itu",
+                "D. Justeru"
+            ],
+            correct: 2,
+            explanation: "'Di samping itu' digunakan sebagai penanda wacana untuk menambah maklumat atau huraian baharu yang selari."
+        },
+        {
+            topic: "Kata Adjektif Waktu",
+            question: "Peristiwa __________ itu akan sentiasa terpahat dalam sejarah perjuangan kemerdekaan negara.",
+            options: [
+                "A. silam",
+                "B. baru",
+                "C. lambat",
+                "D. suntuk"
+            ],
+            correct: 0,
+            explanation: "'Silam' ialah kata adjektif waktu yang bermaksud masa lalu atau zaman dahulu, amat sesuai digandingkan dengan konteks 'sejarah'."
+        },
+        {
+            topic: "Kata Adjektif Ukuran",
+            question: "Laluan ke kampung itu menjadi __________ kerana tebing jalan runtuh akibat hujan lebat.",
+            options: [
+                "A. tebal",
+                "B. sempit",
+                "C. singkat",
+                "D. cetek"
+            ],
+            correct: 1,
+            explanation: "'Sempit' merujuk kepada ukuran ruang atau laluan yang tidak luas, sesuai untuk menerangkan keadaan laluan/jalan."
+        },
+        {
+            topic: "Kata Adjektif Bentuk",
+            question: "Syafiq memotong kertas manila itu menjadi bentuk __________ untuk dijadikan tapak projek model rumahnya.",
+            options: [
+                "A. bulat",
+                "B. leper",
+                "C. segi empat",
+                "D. kempis"
+            ],
+            correct: 2,
+            explanation: "'Segi empat' ialah kata adjektif bentuk dua dimensi yang merujuk kepada reka bentuk geometri tapak struktur."
+        },
+        {
+            topic: "Kata Tanya",
+            question: "__________kah cara-cara untuk menghasilkan baja kompos organik yang berkualiti tinggi ini?",
+            options: [
+                "A. Mengapa",
+                "B. Bagaimanakah",
+                "C. Bagaimana",
+                "D. Apakah"
+            ],
+            correct: 2,
+            explanation: "Sila ambil perhatian: Ayat sudah mengandungi sufiks 'kah' di luar slot teks. Oleh itu, kita pilih 'Bagaimana' supaya menjadi 'Bagaimanakah'. Ia digunakan untuk menanyakan cara/keadaan."
+        },
+        {
+            topic: "Kata Penegas",
+            question: "Hanya iman __________ yang dapat menyelamatkan diri seseorang daripada melakukan perkara negatif.",
+            options: [
+                "A. lah",
+                "B. jua",
+                "C. kah",
+                "D. pun"
+            ],
+            correct: 1,
+            explanation: "'Jua' bertindak sebagai kata penegas yang membawa maksud 'sahaja' atau 'juga' untuk menegaskan subjek sebelumnya."
+        },
+        {
+            topic: "Kata Bantu",
+            question: "Penduduk kampung __________ berkumpul di balai raya sebelum pasukan penyelamat tiba.",
+            options: [
+                "A. telah",
+                "B. akan",
+                "C. belum",
+                "D. sedang"
+            ],
+            correct: 0,
+            explanation: "Kata bantu aspek 'telah' menunjukkan perbuatan berkumpul sudah pun selesai dilakukan sebelum perbuatan berikutnya berlaku."
+        },
+        {
+            topic: "Kata Ganda Penuh",
+            question: "__________ yang menghadiri seminar motivasi itu tekun mencatat nota yang disampaikan penceramah.",
+            options: [
+                "A. Murid-murid",
+                "B. Jejaka-jejaka",
+                "C. Guru-guru",
+                "D. Peserta-peserta"
+            ],
+            correct: 3,
+            explanation: "Konteks 'seminar motivasi' secara umum dihadiri oleh 'peserta-peserta' yang merangkumi pelbagai kumpulan sasaran."
+        },
+        {
+            topic: "Penjodoh Bilangan",
+            question: "Pihak polis menjumpai dua __________ pistol lama dan beberapa __________ peluru di dalam bangunan kosong itu.",
+            options: [
+                "A. laras ... biji",
+                "B. pucuk ... butir",
+                "C. bilah ... buah",
+                "D. batang ... urat"
+            ],
+            correct: 1,
+            explanation: "Penjodoh bilangan untuk senjata api jenis pistol/senapang ialah 'pucuk', manakala objek bulat kecil seperti peluru menggunakan 'butir'."
+        },
+        {
+            topic: "Kata Sendi Nama",
+            question: "Alatan perkhemahan itu diperbuat __________ bahan kitar semula yang kukuh.",
+            options: [
+                "A. dari",
+                "B. daripada",
+                "C. pada",
+                "D. untuk"
+            ],
+            correct: 1,
+            explanation: "'Daripada' digunakan untuk menyatakan asal-usul bahan produk buatan, manakala 'dari' untuk arah, tempat, dan masa (ATM)."
+        },
+        {
+            topic: "Kata Adjektif Perasaan",
+            question: "Ibu berasa sangat __________ akan keselamatan abang yang belum pulang walaupun malam sudah larut.",
+            options: [
+                "A. bimbang",
+                "B. gembira",
+                "C. rindu",
+                "D. kecewa"
+            ],
+            correct: 0,
+            explanation: "'Bimbang' (khawatir) ialah ekspresi perasaan yang paling tepat bagi menggambarkan emosi ibu terhadap anaknya yang lewat pulang."
+        },
+        {
+            topic: "Kata Kerja Transitif Pasif",
+            question: "Lantai ruang tamu yang kotor itu sudah __________ oleh kakak menggunakan cecair pencuci.",
+            options: [
+                "A. dilap",
+                "B. mengelap",
+                "C. dilapkan",
+                "D. terlap"
+            ],
+            correct: 0,
+            explanation: "Kata kerja pasif diri ketiga yang tepat ialah 'dilap' yang bermaksud dibersihkan dengan kain lap oleh ejen (kakak)."
+        },
+        {
+            topic: "Kata Hubung Gabungan",
+            question: "Amran membaca sebuah buku cerita __________ adiknya sedang melukis gambar pemandangan.",
+            options: [
+                "A. lalu",
+                "B. sambil",
+                "C. manakala",
+                "D. malahan"
+            ],
+            correct: 2,
+            explanation: "'Manakala' digunakan untuk menghubungkan dua perkara/aktiviti yang berlaku serentak tetapi melibatkan dua subjek berbeza secara berbandingan."
+        },
+        {
+            topic: "Imbuhan Sisipan",
+            question: "Tapak kasut bola abang yang mempunyai __________ yang tajam itu telah haus.",
+            options: [
+                "A. telapak",
+                "B. gerigi",
+                "C. kemuning",
+                "D. seruling"
+            ],
+            correct: 1,
+            explanation: "'Gerigi' mengandungi imbuhan sisipan '-er-' daripada kata dasar 'gigi', menunjukkan tekstur tajam tonjolan pada tapak kasut."
+        },
+        {
+            topic: "Kata Majmuk Kiasan",
+            question: "Faris menjadi __________ pengurus syarikat itu kerana kejujuran dan kecekapannya melaksanakan tugasan.",
+            options: [
+                "A. anak emas",
+                "B. orang kanan",
+                "C. kaki bangku",
+                "D. buah mulut"
+            ],
+            correct: 1,
+            explanation: "'Orang kanan' bermaksud orang harapan atau pembantu yang paling dipercayai dalam urusan pentadbiran pekerjaan."
+        },
+        {
+            topic: "Kata Adjektif Jarak",
+            question: "Rumah baharu yang dibeli oleh bapa terletak agak __________ dari kawasan bandar yang bising.",
+            options: [
+                "A. jauh",
+                "B. dekat",
+                "C. rapat",
+                "D. nyaris"
+            ],
+            correct: 0,
+            explanation: "'Jauh' menerangkan ruang atau jarak antara dua penempatan yang memerlukan masa perjalanan yang lama."
+        },
+        {
+            topic: "Kesalahan Umum Tatabahasa",
+            question: "Pilih ayat yang betul sepenuhnya daripada aspek struktur dan hukum tatabahasa.",
+            options: [
+                "A. Demi untuk kesejahteraan bersama, kita haruslah bertolak ansur.",
+                "B. Senarai nama-nama peserta kem motivasi telah dipaparkan.",
+                "C. Kebanyakan murid-murid lulus dalam ujian percubaan itu.",
+                "D. Saling membantu antara satu sama lain ialah amalan terpuji."
+            ],
+            correct: 3,
+            explanation: "Pilihan D betul. Pilihan A lewah ('demi untuk'), Pilihan B lewah ('senarai nama-nama'), Pilihan C lewah ('kebanyakan murid-murid' - kebanyakan sudah menunjukkan jamak)."
+        }
+    ];
+
+    let userAnswers = new Array(questionsData.length).fill(null);
+    let questionAttempts = new Array(questionsData.length).fill(0); // tracks attempts (0, 1, or 2)
+    let questionStatus = new Array(questionsData.length).fill('active'); // 'active', 'locked-correct', 'locked-wrong'
+
+    const quizContainer = document.getElementById('quiz-container');
+
+    // Render questions
+    function initQuiz() {
+        questionsData.forEach((q, index) => {
+            const card = document.createElement('div');
+            card.className = `question-card`;
+            card.id = `q-card-${index}`;
+            
+            let optionsHTML = '';
+            q.options.forEach((opt, optIndex) => {
+                optionsHTML += `
+                    <button class="option-btn" 
+                            id="btn-${index}-${optIndex}" 
+                            onclick="selectOption(${index}, ${optIndex})">
+                        ${opt}
+                    </button>
+                `;
+            });
+
+            card.innerHTML = `
+                <div class="question-header">
+                    <span class="question-number">Soalan ${index + 1} / ${questionsData.length}</span>
+                    <span class="question-topic">${q.topic}</span>
+                </div>
+                <div class="question-text">${q.question}</div>
+                <div class="options-container" id="options-container-${index}">
+                    ${optionsHTML}
+                </div>
+                <div class="status-badge" id="status-${index}"></div>
+                <div class="explanation-box" id="explanation-${index}">
+                    <strong>💡 Penerangan Pakar:</strong> ${q.explanation}
+                </div>
+            `;
+            quizContainer.appendChild(card);
+        });
+        updateProgressBar();
+    }
+
+    function selectOption(qIndex, optIndex) {
+        // If question already locked, do nothing
+        if (questionStatus[qIndex] !== 'active') return;
+
+        const correctOpt = questionsData[qIndex].correct;
+        const clickedBtn = document.getElementById(`btn-${qIndex}-${optIndex}`);
+        const statusBadge = document.getElementById(`status-${qIndex}`);
+        const card = document.getElementById(`q-card-${index = qIndex}`);
+
+        questionAttempts[qIndex]++;
+
+        if (optIndex === correctOpt) {
+            // Correct Answer
+            playSound('correct');
+            clickedBtn.classList.add('selected-correct');
+            questionStatus[qIndex] = 'locked-correct';
+            userAnswers[qIndex] = optIndex;
+            statusBadge.innerHTML = "🟢 Betul!";
+            statusBadge.className = "status-badge locked-correct";
+            lockQuestion(qIndex);
+        } else {
+            // Incorrect Answer
+            playSound('wrong');
+            clickedBtn.classList.add('wrong-attempt');
+            clickedBtn.disabled = true;
+
+            if (questionAttempts[qIndex] === 1) {
+                // First failed attempt -> Give second chance
+                statusBadge.innerHTML = "⚠️ Salah! Anda diberi peluang terakhir untuk cuba lagi.";
+                statusBadge.className = "status-badge try-again";
+                card.classList.add('active-card');
+            } else {
+                // Second failed attempt -> Lock and force proceed
+                questionStatus[qIndex] = 'locked-wrong';
+                userAnswers[qIndex] = optIndex;
+                statusBadge.innerHTML = "🔴 Salah lagi. Soalan ini dikunci. Sila teruskan.";
+                statusBadge.className = "status-badge locked-wrong";
+                card.classList.remove('active-card');
+                lockQuestion(qIndex);
+            }
+        }
+
+        updateProgressBar();
+        checkCompletion();
+    }
+
+    function lockQuestion(qIndex) {
+        const container = document.getElementById(`options-container-${qIndex}`);
+        const buttons = container.getElementsByClassName('option-btn');
+        for (let btn of buttons) {
+            btn.disabled = true;
+        }
+    }
+
+    function updateProgressBar() {
+        const completedCount = questionStatus.filter(s => s !== 'active').length;
+        const total = questionsData.length;
+        const percent = Math.round((completedCount / total) * 100);
+
+        document.getElementById('progress-text').innerText = `Status Menjawab: ${completedCount} daripada ${total} soalan selesai`;
+        document.getElementById('progress-percent').innerText = `${percent}%`;
+        document.getElementById('progress-fill').style.width = `${percent}%`;
+    }
+
+    function checkCompletion() {
+        const completedCount = questionStatus.filter(s => s !== 'active').length;
+        if (completedCount === questionsData.length) {
+            document.getElementById('check-answers-btn').style.display = 'inline-block';
+            document.getElementById('check-answers-btn').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function revealAllExplanations() {
+        let score = 0;
+        questionsData.forEach((q, index) => {
+            const expBox = document.getElementById(`explanation-${index}`);
+            expBox.classList.add('show');
+
+            // Color code the absolute correct answer background as a guide
+            const correctBtn = document.getElementById(`btn-${index}-${q.correct}`);
+            correctBtn.classList.add('reveal-correct');
+
+            if (questionStatus[index] === 'locked-correct') {
+                score++;
+            }
+        });
+
+        // Display results dashboard
+        const resultsPanel = document.getElementById('results-panel');
+        const scoreDisplay = document.getElementById('score-display');
+        const scoreComment = document.getElementById('score-comment');
+
+        scoreDisplay.innerText = `${score} / ${questionsData.length}`;
+        resultsPanel.style.display = 'block';
+
+        if (score >= 35) {
+            scoreComment.innerText = "Cemerlang! Anda seorang Pakar Tatabahasa Tahap Tinggi! 🏆";
+        } else if (score >= 25) {
+            scoreComment.innerText = "Bagus! Pemahaman yang kukuh, tingkatkan sedikit lagi usaha! 🌟";
+        } else {
+            scoreComment.innerText = "Teruskan berusaha! Ulang kaji nota huraian di bawah untuk pengukuhan. 📚";
+        }
+
+        resultsPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
