@@ -150,7 +150,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 15px;
-            border-bottom: 1px fill #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
             padding-bottom: 10px;
         }
 
@@ -367,8 +367,7 @@
     </div>
 
     <div class="quiz-space" id="quiz-container">
-        <!-- Questions dynamically loaded here -->
-    </div>
+        </div>
 
     <div class="action-space">
         <button class="submit-btn" id="check-answers-btn" onclick="revealAllExplanations()">Semak Jawapan Keseluruhan</button>
@@ -376,32 +375,53 @@
 </div>
 
 <script>
-    // Audio synthesis using Web Audio API to prevent external resource failure
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Audio synthesis context ditangguhkan sehingga pengguna klik
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            } catch (e) {
+                console.warn("Fungsi audio tidak disokong pada pelayar ini.");
+            }
+        }
+    }
 
     function playSound(type) {
+        initAudio();
+        if (!audioCtx) return;
+
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
 
-        if (type === 'correct') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            osc.start();
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-            osc.stop(audioCtx.currentTime + 0.25);
-        } else if (type === 'wrong') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(146.83, audioCtx.currentTime); // D3
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.35);
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                osc.start();
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(146.83, audioCtx.currentTime); // D3
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            }
+        } catch (err) {
+            console.log("Ralat audio terhenti:", err);
         }
     }
 
@@ -528,7 +548,7 @@
         },
         {
             topic: "Kata Ganti Nama Diri",
-            question: ""__________ mahu kamu semua bersiap sedia untuk menduduki ujian esok," kata Cikgu Halim kepada murid-muridnya.",
+            question: "\"__________ mahu kamu semua bersiap sedia untuk menduduki ujian esok,\" kata Cikgu Halim kepada murid-muridnya.",
             options: [
                 "A. Beliau",
                 "B. Saya",
@@ -889,12 +909,11 @@
     ];
 
     let userAnswers = new Array(questionsData.length).fill(null);
-    let questionAttempts = new Array(questionsData.length).fill(0); // tracks attempts (0, 1, or 2)
-    let questionStatus = new Array(questionsData.length).fill('active'); // 'active', 'locked-correct', 'locked-wrong'
+    let questionAttempts = new Array(questionsData.length).fill(0); 
+    let questionStatus = new Array(questionsData.length).fill('active'); 
 
     const quizContainer = document.getElementById('quiz-container');
 
-    // Render questions
     function initQuiz() {
         questionsData.forEach((q, index) => {
             const card = document.createElement('div');
@@ -932,18 +951,16 @@
     }
 
     function selectOption(qIndex, optIndex) {
-        // If question already locked, do nothing
         if (questionStatus[qIndex] !== 'active') return;
 
         const correctOpt = questionsData[qIndex].correct;
         const clickedBtn = document.getElementById(`btn-${qIndex}-${optIndex}`);
         const statusBadge = document.getElementById(`status-${qIndex}`);
-        const card = document.getElementById(`q-card-${index = qIndex}`);
+        const card = document.getElementById(`q-card-${qIndex}`);
 
         questionAttempts[qIndex]++;
 
         if (optIndex === correctOpt) {
-            // Correct Answer
             playSound('correct');
             clickedBtn.classList.add('selected-correct');
             questionStatus[qIndex] = 'locked-correct';
@@ -952,18 +969,15 @@
             statusBadge.className = "status-badge locked-correct";
             lockQuestion(qIndex);
         } else {
-            // Incorrect Answer
             playSound('wrong');
             clickedBtn.classList.add('wrong-attempt');
             clickedBtn.disabled = true;
 
             if (questionAttempts[qIndex] === 1) {
-                // First failed attempt -> Give second chance
                 statusBadge.innerHTML = "⚠️ Salah! Anda diberi peluang terakhir untuk cuba lagi.";
                 statusBadge.className = "status-badge try-again";
                 card.classList.add('active-card');
             } else {
-                // Second failed attempt -> Lock and force proceed
                 questionStatus[qIndex] = 'locked-wrong';
                 userAnswers[qIndex] = optIndex;
                 statusBadge.innerHTML = "🔴 Salah lagi. Soalan ini dikunci. Sila teruskan.";
@@ -1009,16 +1023,16 @@
             const expBox = document.getElementById(`explanation-${index}`);
             expBox.classList.add('show');
 
-            // Color code the absolute correct answer background as a guide
             const correctBtn = document.getElementById(`btn-${index}-${q.correct}`);
-            correctBtn.classList.add('reveal-correct');
+            if(correctBtn) {
+                correctBtn.classList.add('reveal-correct');
+            }
 
             if (questionStatus[index] === 'locked-correct') {
                 score++;
             }
         });
 
-        // Display results dashboard
         const resultsPanel = document.getElementById('results-panel');
         const scoreDisplay = document.getElementById('score-display');
         const scoreComment = document.getElementById('score-comment');
@@ -1037,7 +1051,6 @@
         resultsPanel.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Initialize on window load
     window.onload = initQuiz;
 </script>
 
